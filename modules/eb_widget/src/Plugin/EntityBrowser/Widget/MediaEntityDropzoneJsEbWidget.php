@@ -180,9 +180,9 @@ class MediaEntityDropzoneJsEbWidget extends DropzoneJsEbWidget {
   public function submit(array &$element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\media_entity\MediaInterface[] $media_entities */
     $media_entities = $this->prepareEntities($form, $form_state);
-    $source_field = $this->getBundle()->getTypeConfiguration()['source_field'];
 
     foreach ($media_entities as &$media_entity) {
+      $source_field = $this->getBundle()->getTypeConfiguration()['source_field'];
       $file = $media_entity->$source_field->entity;
       /** @var \Drupal\dropzonejs\Events\DropzoneMediaEntityCreateEvent $event */
       $event = $this->eventDispatcher->dispatch(Events::MEDIA_ENTITY_CREATE, new DropzoneMediaEntityCreateEvent($media_entity, $file, $form, $form_state, $element));
