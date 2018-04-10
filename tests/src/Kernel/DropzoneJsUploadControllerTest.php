@@ -67,7 +67,6 @@ class DropzoneJsUploadControllerTest extends KernelTestBase {
       ->set('path.temporary', $this->filesDir)
       ->save();
 
-    $this->tmpFile = tempnam($this->filesDir, $this->testfilePrefix);
     $this->tmpFile = tempnam('', $this->testfilePrefix);
     file_put_contents($this->tmpFile, $this->testfileData);
   }
