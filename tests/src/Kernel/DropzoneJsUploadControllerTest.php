@@ -97,7 +97,7 @@ class DropzoneJsUploadControllerTest extends KernelTestBase {
 
     $result = json_decode($controller_result->getContent());
     $result_file = $this->filesDir . '/' . $result->result;
-    $this->assertStringEndsWith('-kapla_aa1.jpg.txt', $result_file);
+    $this->assertStringEndsWith('-kaplya_aa1.jpg.txt', $result_file);
     $this->assertTrue(file_exists($result_file));
     $this->assertEquals(file_get_contents($result_file), $this->testfileData);
   }
