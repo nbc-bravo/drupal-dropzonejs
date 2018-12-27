@@ -163,6 +163,7 @@ class MediaEntityDropzoneJsEbWidget extends DropzoneJsEbWidget {
 
     foreach (parent::prepareEntities($form, $form_state) as $file) {
       $entities[] = $this->entityTypeManager->getStorage('media')->create([
+        'name' => $file->label(),
         'bundle' => $media_type->id(),
         $media_type->getSource()->getConfiguration()['source_field'] => $file,
         'uid' => $this->currentUser->id(),
