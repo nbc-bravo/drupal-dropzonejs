@@ -3,10 +3,12 @@
 namespace Drupal\dropzonejs_eb_widget\Plugin\EntityBrowser\Widget;
 
 use Drupal\Component\Utility\Bytes;
+use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Utility\Token;
@@ -50,6 +52,13 @@ class DropzoneJsEbWidget extends WidgetBase {
   protected $token;
 
   /**
+   * The file system service.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
    * Constructs widget plugin.
    *
    * @param array $configuration
@@ -71,11 +80,12 @@ class DropzoneJsEbWidget extends WidgetBase {
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, DropzoneJsUploadSaveInterface $dropzonejs_upload_save, AccountProxyInterface $current_user, Token $token) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, DropzoneJsUploadSaveInterface $dropzonejs_upload_save, AccountProxyInterface $current_user, Token $token, FileSystemInterface $fileSystem) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->dropzoneJsUploadSave = $dropzonejs_upload_save;
     $this->currentUser = $current_user;
     $this->token = $token;
+    $this->fileSystem = $fileSystem;
   }
 
   /**
@@ -91,7 +101,8 @@ class DropzoneJsEbWidget extends WidgetBase {
       $container->get('plugin.manager.entity_browser.widget_validation'),
       $container->get('dropzonejs.upload_save'),
       $container->get('current_user'),
-      $container->get('token')
+      $container->get('token'),
+      $container->get('file_system')
     );
   }
 
@@ -102,7 +113,7 @@ class DropzoneJsEbWidget extends WidgetBase {
     return [
       'upload_location' => 'public://[date:custom:Y]-[date:custom:m]',
       'dropzone_description' => $this->t('Drop files here to upload them'),
-      'max_filesize' => file_upload_max_size() / pow(Bytes::KILOBYTE, 2) . 'M',
+      'max_filesize' => Environment::getUploadMaxSize() / pow(Bytes::KILOBYTE, 2) . 'M',
       'extensions' => 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp',
       'clientside_resize' => FALSE,
       'resize_width' => NULL,
@@ -247,7 +258,7 @@ class DropzoneJsEbWidget extends WidgetBase {
     // it's still better not to rely only on client side validation.
     if (($trigger['#type'] == 'submit' && $trigger['#name'] == 'op') || $trigger['#name'] === 'auto_select_handler') {
       $upload_location = $this->getUploadLocation();
-      if (!file_prepare_directory($upload_location, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+      if (!$this->fileSystem->prepareDirectory($upload_location, FileSystemInterface::MODIFY_PERMISSIONS)) {
         $form_state->setError($form['widget']['upload'], $this->t('Files could not be uploaded because the destination directory %destination is not configured correctly.', ['%destination' => $this->getConfiguration()['settings']['upload_location']]));
       }
 
