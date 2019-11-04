@@ -7,16 +7,13 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\dropzonejs\DropzoneJsUploadSaveInterface;
 use Drupal\entity_browser\WidgetBase;
-use Drupal\entity_browser\WidgetValidationManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides an Entity Browser widget that uploads new files.
@@ -59,51 +56,56 @@ class DropzoneJsEbWidget extends WidgetBase {
   protected $fileSystem;
 
   /**
-   * Constructs widget plugin.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   Event dispatcher service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
-   *   The Widget Validation Manager service.
-   * @param \Drupal\dropzonejs\DropzoneJsUploadSaveInterface $dropzonejs_upload_save
-   *   The upload saving dropzonejs service.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
-   *   The current user service.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token service.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, DropzoneJsUploadSaveInterface $dropzonejs_upload_save, AccountProxyInterface $current_user, Token $token, FileSystemInterface $fileSystem) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
-    $this->dropzoneJsUploadSave = $dropzonejs_upload_save;
-    $this->currentUser = $current_user;
-    $this->token = $token;
-    $this->fileSystem = $fileSystem;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('event_dispatcher'),
-      $container->get('entity_type.manager'),
-      $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('dropzonejs.upload_save'),
-      $container->get('current_user'),
-      $container->get('token'),
-      $container->get('file_system')
-    );
+    $widget = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $widget->setDropzoneJsUploadSave($container->get('dropzonejs.upload_save'));
+    $widget->setCurrentUser($container->get('current_user'));
+    $widget->setToken($container->get('token'));
+    $widget->setFileSystem($container->get('file_system'));
+
+    return $widget;
+  }
+
+  /**
+   * Set the upload saving dropzonejs service.
+   *
+   * @param \Drupal\dropzonejs\DropzoneJsUploadSaveInterface $dropzoneJsUploadSave
+   *   The upload saving dropzonejs service.
+   */
+  protected function setDropzoneJsUploadSave(DropzoneJsUploadSaveInterface $dropzoneJsUploadSave) {
+    $this->dropzoneJsUploadSave = $dropzoneJsUploadSave;
+  }
+
+  /**
+   * Set the current user service.
+   *
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+   *   The current user service.
+   */
+  protected function setCurrentUser(AccountProxyInterface $currentUser) {
+    $this->currentUser = $currentUser;
+  }
+
+  /**
+   * Set the token service.
+   *
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
+   */
+  protected function setToken(Token $token) {
+    $this->token = $token;
+  }
+
+  /**
+   * Set the filesystem service.
+   *
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The filesystem service.
+   */
+  protected function setFileSystem(FileSystemInterface $fileSystem) {
+    $this->fileSystem = $fileSystem;
   }
 
   /**
