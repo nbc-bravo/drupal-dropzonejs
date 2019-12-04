@@ -226,7 +226,9 @@ class DropzoneJsEbWidget extends WidgetBase {
           $this->currentUser,
           $additional_validators
         );
-        $files[] = $entity;
+        if ($entity) {
+          $files[] = $entity;
+        }
       }
     }
 
