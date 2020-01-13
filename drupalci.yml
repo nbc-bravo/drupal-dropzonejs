@@ -15,11 +15,12 @@ build:
         halt-on-fail: false
     testing:
       container_command:
-        commands: "cd ${SOURCE_DIR} &&
-        sudo -u www-data mkdir libraries &&
-        sudo -u www-data curl https://codeload.github.com/enyo/dropzone/tar.gz/v5.5.0 --output dropzone.tar.gz --silent &&
-        sudo -u www-data tar xzf dropzone.tar.gz &&
-        sudo -u www-data mv dropzone-5.5.0 libraries/dropzone"
+        commands:
+         - "cd ${SOURCE_DIR}"
+         - "sudo -u www-data mkdir libraries"
+         - "sudo -u www-data curl https://codeload.github.com/enyo/dropzone/tar.gz/v5.5.0 --output dropzone.tar.gz --silent"
+         - "sudo -u www-data tar xzf dropzone.tar.gz"
+         - "sudo -u www-data mv dropzone-5.5.0 libraries/dropzone"
         halt-on-fail: true
       # run_tests task is executed several times in order of performance speeds.
       # halt-on-fail can be set on the run_tests tasks in order to fail fast.
