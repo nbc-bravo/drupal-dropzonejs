@@ -262,7 +262,7 @@ class DropzoneJsEbWidget extends WidgetBase {
     // it's still better not to rely only on client side validation.
     if (($trigger['#type'] == 'submit' && $trigger['#name'] == 'op') || $trigger['#name'] === 'auto_select_handler') {
       $upload_location = $this->getUploadLocation();
-      if (!$this->fileSystem->prepareDirectory($upload_location, FileSystemInterface::MODIFY_PERMISSIONS)) {
+      if (!$this->fileSystem->prepareDirectory($upload_location, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
         $form_state->setError($form['widget']['upload'], $this->t('Files could not be uploaded because the destination directory %destination is not configured correctly.', ['%destination' => $this->getConfiguration()['settings']['upload_location']]));
       }
 
