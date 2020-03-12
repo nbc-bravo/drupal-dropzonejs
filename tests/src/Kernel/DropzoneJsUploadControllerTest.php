@@ -57,15 +57,11 @@ class DropzoneJsUploadControllerTest extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
     $this->installConfig('dropzonejs');
     $this->installEntitySchema('user');
 
     $this->filesDir = $this->siteDirectory . '/files';
-    $config = $this->container->get('config.factory');
-    $config->getEditable('system.file')
-      ->set('path.temporary', $this->filesDir)
-      ->save();
+    $this->setSetting('file_temp_path', $this->filesDir);
 
     $this->tmpFile = tempnam('', $this->testfilePrefix);
     file_put_contents($this->tmpFile, $this->testfileData);
@@ -93,12 +89,12 @@ class DropzoneJsUploadControllerTest extends KernelTestBase {
     $upload_handler = $this->container->get('dropzonejs.upload_handler');
     $controller = new UploadController($upload_handler, $request);
     $controller_result = $controller->handleUploads();
-    $this->assertTrue($controller_result instanceof JsonResponse);
+    $this->assertInstanceOf(JsonResponse::class, $controller_result);
 
     $result = json_decode($controller_result->getContent());
     $result_file = $this->filesDir . '/' . $result->result;
     $this->assertStringEndsWith('-kaplya_aa1.jpg.txt', $result_file);
-    $this->assertTrue(file_exists($result_file));
+    $this->assertFileExists($result_file);
     $this->assertEquals(file_get_contents($result_file), $this->testfileData);
   }
 
