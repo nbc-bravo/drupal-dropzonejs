@@ -98,4 +98,36 @@ class DropzoneJsUploadControllerTest extends KernelTestBase {
     $this->assertEquals(file_get_contents($result_file), $this->testfileData);
   }
 
+  /**
+   * Tests that dropzoneJs ignores filename transliteration.
+   */
+  public function testIgnoreTransliteration() {
+    $this->container->get('router.builder')->rebuild();
+
+    $language = ConfigurableLanguage::createFromLangcode('zh-hans');
+    $language->save();
+    $this->config('system.site')->set('default_langcode', $language->getId())->save();
+    $this->config('dropzonejs.settings')->set('filename_transliteration', FALSE)->save();
+
+    // The filename should be expected as it is.
+    $chinese_with_emoji_fileanme_without_extension = '中文😁';
+    $uploaded_file = new UploadedFile($this->tmpFile, "{$this->testfilePrefix}${chinese_with_emoji_fileanme_without_extension}.jpg");
+    $file_bag = new FileBag();
+    $file_bag->set('file', $uploaded_file);
+
+    $request = new Request();
+    $request->files = $file_bag;
+
+    $upload_handler = $this->container->get('dropzonejs.upload_handler');
+    $controller = new UploadController($upload_handler, $request);
+    $controller_result = $controller->handleUploads();
+    $this->assertInstanceOf(JsonResponse::class, $controller_result);
+
+    $result = json_decode($controller_result->getContent());
+    $result_file = $this->filesDir . '/' . $result->result;
+    $this->assertStringEndsWith($chinese_with_emoji_fileanme_without_extension . '.jpg.txt', $result_file);
+    $this->assertFileExists($result_file);
+    $this->assertStringEqualsFile($result_file, $this->testfileData);
+  }
+
 }

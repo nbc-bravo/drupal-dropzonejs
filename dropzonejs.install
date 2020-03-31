@@ -51,3 +51,14 @@ function dropzonejs_update_8001() {
   $config->set('tmp_upload_scheme', 'temporary');
   $config->save(TRUE);
 }
+
+/**
+ * Set default value for transliterate file name.
+ */
+function dropzonejs_update_8002() {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('dropzonejs.settings');
+  $config->clear('filename_transliteration');
+  $config->set('filename_transliteration', TRUE);
+  $config->save(TRUE);
+}
