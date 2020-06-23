@@ -55,7 +55,7 @@ class UploadController extends ControllerBase {
   }
 
   /**
-   * Handles DropzoneJs uploads.
+   * Handles DropzoneJS uploads.
    */
   public function handleUploads() {
     $file = $this->request->files->get('file');

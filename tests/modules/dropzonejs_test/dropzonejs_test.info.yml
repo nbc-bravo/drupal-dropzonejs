@@ -1,6 +1,6 @@
-name: 'DropzoneJs Test'
+name: 'DropzoneJS Test'
 type: module
-description: 'Support module for DropzoneJs tests.'
+description: 'Support module for DropzoneJS tests.'
 package: Testing
 version: VERSION
 dependencies:
