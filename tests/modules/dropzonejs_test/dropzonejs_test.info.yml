@@ -1,6 +1,7 @@
 name: 'DropzoneJS Test'
 type: module
 description: 'Support module for DropzoneJS tests.'
+core_version_requirement: ^8.8 || ^9
 package: Testing
 version: VERSION
 dependencies:
