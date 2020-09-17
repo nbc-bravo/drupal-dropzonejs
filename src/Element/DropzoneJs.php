@@ -171,8 +171,6 @@ class DropzoneJs extends FormElement {
         $file_names = array_filter(explode(';', $user_input['uploaded_files']));
         $tmp_upload_scheme = \Drupal::configFactory()->get('dropzonejs.settings')->get('tmp_upload_scheme');
 
-        $file_names = explode(',', $file_names[0]);
-
         foreach ($file_names as $name) {
           // The upload handler appended the txt extension to the file for
           // security reasons. We will remove it in this callback.
