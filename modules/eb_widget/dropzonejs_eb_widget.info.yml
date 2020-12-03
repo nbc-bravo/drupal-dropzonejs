@@ -1,6 +1,6 @@
 name: DropzoneJS entity browser widget
 type: module
-description: DropzoneJS Entity browser widget
+description: 'DropzoneJS Entity browser widget.'
 core_version_requirement: ^8.8 || ^9
 package: Media
 dependencies:
